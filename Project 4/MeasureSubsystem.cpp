@@ -1,5 +1,5 @@
 #include "MeasureSubsystem.h"
-// #include <Arduino.h>
+#include <Arduino.h>
 #include "bool.h"
 
 bool even = TRUE;
@@ -112,13 +112,13 @@ void MeasureSubsystemFunction(void* data) {
     // pushSampleLong(measureData->bloodPressRawPtr, systolicPressRaw_t, TRUE); // systolic
     // pushSampleLong(measureData->bloodPressRawPtr,diastolicPressRaw_t, FALSE); // diastolic
     // pushSample(measureData->pulseRateRawPtr,pulseRateRaw_t);  
-//  pushSample(measureData->systolicPressRawPtr,systolicPressRaw_t);
-//  pushSample(measureData->diastolicPressRawPtr,diastolicPressRaw_t);
+    //  pushSample(measureData->systolicPressRawPtr,systolicPressRaw_t);
+    //  pushSample(measureData->diastolicPressRawPtr,diastolicPressRaw_t);
     
     // printBuffer(measureData->temperatureRawPtr, 8);
     // printBuffer(measureData->bloodPressRawPtr, 16);
     // printBuffer(measureData->pulseRateRawPtr, 8);
-//  printBuffer(measureData->systolicPressRawPtr, 8);
-//  printBuffer(measureData->diastolicPressRawPtr, 8);
+    //  printBuffer(measureData->systolicPressRawPtr, 8);
+    //  printBuffer(measureData->diastolicPressRawPtr, 8);
     
 }

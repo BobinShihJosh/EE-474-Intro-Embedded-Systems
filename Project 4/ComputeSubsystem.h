@@ -1,0 +1,21 @@
+#ifndef COMPUTE_H_INCLUDED
+#define COMPUTE_H_INCLUDED
+
+#include "bool.h"
+
+typedef struct ComputeSubsystemData{
+    unsigned int *temperatureRawPtr;
+    // unsigned int *systolicPressRawPtr;
+    // unsigned int *diastolicPressRawPtr;
+    // unsigned int *pulseRateRawPtr;
+    unsigned int *tempCorrectedPtr;
+    // unsigned int *sysPressCorrectedPtr;
+    // unsigned int *diasPressCorrectedPtr;
+    // unsigned int *pulseRateCorrectedPtr;
+    // unsigned int *bloodPressCorrectedPtr;
+    unsigned short *measurementSelection;
+}computeSubsystemData;
+
+void ComputeSubsystemFunction(void *data);
+
+#endif // COMPUTE_H_INCLUDED
