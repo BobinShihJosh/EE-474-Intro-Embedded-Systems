@@ -6,7 +6,7 @@
 typedef struct TFTkeypadSubsystemData{
     unsigned int *functionSelectPtr;
     unsigned int *measurementSelectionPtr;
-    unsigned int *acknowledgePtr;
+    unsigned int *alarmAcknowledgePtr;
 }tftkeypadSubsystemData;
 
 void TFTkeypadSubsystemFunction(void *data);
