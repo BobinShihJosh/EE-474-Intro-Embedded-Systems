@@ -1,5 +1,5 @@
 #include "MeasureSubsystem.h"
-#include <Arduino.h>
+// #include <Arduino.h>
 #include "bool.h"
 
 bool even = TRUE;

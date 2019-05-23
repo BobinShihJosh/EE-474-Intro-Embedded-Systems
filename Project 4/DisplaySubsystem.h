@@ -7,7 +7,7 @@ typedef struct DisplaySubsystemData{
     unsigned int *temperatureCorrectedPtr;
     unsigned short *measurementSelection;
     unsigned int *tempOutOfRange;
-    unsigned bool *tempHigh;
+    Bool *tempHigh;
 
     // unsigned short *measurementSelection;
 } DisplaySubsystemData;
