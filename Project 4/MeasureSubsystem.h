@@ -4,12 +4,12 @@
 #include "bool.h"
 
 typedef struct MeasureSubsystemData{
-    // unsigned int *temperatureRawPtr;
+    unsigned int *temperatureRawPtr;
     // unsigned int *bloodPressRawPtr;
-    unsigned int *systolicPressRawPtr;
-    unsigned int *diastolicPressRawPtr;
-    unsigned int *pulseRateRawPtr;
-    // unsigned short *measurementSelection;
+    // unsigned int *systolicPressRawPtr;
+    // unsigned int *diastolicPressRawPtr;
+    // unsigned int *pulseRateRawPtr;
+    unsigned short *measurementSelection;
 } measureSubsystemData;
 
 void MeasureSubsystemFunction(void *data);

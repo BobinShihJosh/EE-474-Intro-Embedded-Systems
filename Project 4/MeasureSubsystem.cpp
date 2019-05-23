@@ -1,19 +1,19 @@
 #include "MeasureSubsystem.h"
 // #include <Arduino.h>
 #include "bool.h"
-// #include "circularBuffer.h"
 
 bool even = TRUE;
-// bool tempReverse = TRUE;
 bool pulseReverse = TRUE;
+bool tempReverse = TRUE;
 bool systolicFlag = FALSE;
 bool diastolicFlag = FALSE;
 
 void MeasureSubsystemFunction(void* data) {
-    // unsigned int temperatureRaw_t;
-    unsigned int systolicPressRaw_t;
-    unsigned int diastolicPressRaw_t;
-    unsigned int pulseRateRaw_t;
+    unsigned int temperatureRaw_t;
+    // unsigned int systolicPressRaw_t;
+    // unsigned int diastolicPressRaw_t;
+    // unsigned int pulseRateRaw_t;
+    unsigned short measurementSelection_t;
     // unsigned int index_temperature;
     // unsigned int index_systolicPressure;
     // unsigned int index_diastolicPressure;
@@ -25,84 +25,88 @@ void MeasureSubsystemFunction(void* data) {
     // index_systolicPressure = *(measureData->bloodPressRawPtr+1);
     // index_diastolicPressure = *(measureData->bloodPressRawPtr+9);
     // index_pulseRate = *(measureData->pulseRateRawPtr+1);
-    // temperatureRaw_t = *(measureData->temperatureRawPtr+index_temperature);
-    systolicPressRaw_t = *(measureData->systolicPressRawPtr);
-    diastolicPressRaw_t = *(measureData->diastolicPressRawPtr);
-    pulseRateRaw_t = *(measureData->pulseRateRawPtr);
+    temperatureRaw_t = *(measureData->temperatureRawPtr);
+    measurementSelection_t = *(measureData->measurementSelection);
+    // systolicPressRaw_t = *(measureData->systolicPressRawPtr);
+    // diastolicPressRaw_t = *(measureData->diastolicPressRawPtr);
+    // pulseRateRaw_t = *(measureData->pulseRateRawPtr);
  
     if (even) {
         // tempRaw
-        // if (!tempReverse) {
-        //   temperatureRaw_t += 2;
-        //   if (temperatureRaw_t > 50) {
-        //       tempReverse = !tempReverse;
-        //   } 
-        // } else {
-        //   temperatureRaw_t -= 2;
-        //   if (temperatureRaw_t < 15) {
-        //       tempReverse = !tempReverse;
-        //   }
-        // }
+        if (measurementSelection_t == 0) {
+            if (!tempReverse) {
+                temperatureRaw_t += 2;
+                if (temperatureRaw_t > 50) {
+                    tempReverse = !tempReverse;
+                } 
+            } else {
+                temperatureRaw_t -= 2;
+                if (temperatureRaw_t < 15) {
+                    tempReverse = !tempReverse;
+                }
+            }
+        }
+        
 
 
         // systolicPressRaw
-        systolicPressRaw_t += 3;
-        if (systolicPressRaw_t > 100) {
-          systolicPressRaw_t = 80;
-          systolicFlag = TRUE; // maybe send to globals? 
-        } else {
-          systolicFlag = FALSE;  
-        }
+        // systolicPressRaw_t += 3;
+        // if (systolicPressRaw_t > 100) {
+        //   systolicPressRaw_t = 80;
+        //   systolicFlag = TRUE; // maybe send to globals? 
+        // } else {
+        //   systolicFlag = FALSE;  
+        // }
         
         // diastolicPressRaw
-        diastolicPressRaw_t -= 2;
-        if (diastolicPressRaw_t < 40) {
-            diastolicFlag = TRUE; //set variable not sure, may be just local
-            diastolicPressRaw_t = 80;
-        } else {
-            diastolicFlag = FALSE;
-        }
+        // diastolicPressRaw_t -= 2;
+        // if (diastolicPressRaw_t < 40) {
+        //     diastolicFlag = TRUE; //set variable not sure, may be just local
+        //     diastolicPressRaw_t = 80;
+        // } else {
+        //     diastolicFlag = FALSE;
+        // }
 
         //pulseRateRaw
-        if (!pulseReverse) {
-          pulseRateRaw_t -= 1;
+        // if (!pulseReverse) {
+        //   pulseRateRaw_t -= 1;
             
-        } else {
-          pulseRateRaw_t += 1;
-        }
+        // } else {
+        //   pulseRateRaw_t += 1;
+        // }
     } else {
-         // tempRaw
-    //     if (!tempReverse) {
-    //         temperatureRaw_t -= 1;
-    //     } else {
-    //       temperatureRaw_t += 1;
-    //     }
-    //    // systolicPressRaw
-    //     systolicPressRaw_t -= 1;
+        // tempRaw
+        if (measurementSelection_t == 0) {
+            if (!tempReverse) {
+                temperatureRaw_t -= 1;
+            } else {
+                temperatureRaw_t += 1;
+            }
+        }
+        
+       // systolicPressRaw
+        // systolicPressRaw_t -= 1;
 
     //     // diastolicPressRaw
     //     diastolicPressRaw_t += 1;
 
 
         //pulseRateRaw
-        if (!pulseReverse) {
-          pulseRateRaw_t += 3;
-          if (pulseRateRaw_t > 40) {
-             pulseReverse = !pulseReverse;
-          } 
-        } else {
-          pulseRateRaw_t -= 3;
-          if (pulseRateRaw_t < 15) {
-             pulseReverse = !pulseReverse;
-          }
-        }
+        // if (!pulseReverse) {
+        //   pulseRateRaw_t += 3;
+        //   if (pulseRateRaw_t > 40) {
+        //      pulseReverse = !pulseReverse;
+        //   } 
+        // } else {
+        //   pulseRateRaw_t -= 3;
+        //   if (pulseRateRaw_t < 15) {
+        //      pulseReverse = !pulseReverse;
+        //   }
+        // }
     }
     even = !even;
 
-    *(measureData->systolicPressRawPtr) = systolicPressRaw_t;
-    *(measureData->diastolicPressRawPtr) = diastolicPressRaw_t;
-    *(measureData->pulseRateRawPtr) = pulseRateRaw_t;
-
+    *(measureData->temperatureRawPtr) = temperatureRaw_t;
 
     // pushSample(measureData->temperatureRawPtr,temperatureRaw_t);
     // pushSampleLong(measureData->bloodPressRawPtr, systolicPressRaw_t, TRUE); // systolic
