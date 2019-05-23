@@ -1,5 +1,5 @@
-#ifndef WARNINGALARM_H_INCLUDED
-#define WARNINGALARM_H_INCLUDED
+#ifndef WARNINGALARMSUBSYSTEM_H_INCLUDED
+#define WARNINGALARMSUBSYSTEM_H_INCLUDED
 
 #include "bool.h"
 
@@ -7,7 +7,7 @@ typedef struct WarningAlarmSubsystemData{
     unsigned int *temperatureRawPtr;
     unsigned short *measurementSelection;
     unsigned int *tempOutOfRange;
-    unsigned bool *tempHigh;
+    Bool *tempHigh;
 
     // unsigned short *measurementSelection;
 } WarningAlarmSubsystemData;
