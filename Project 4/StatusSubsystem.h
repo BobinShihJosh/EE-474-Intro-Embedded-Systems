@@ -4,7 +4,7 @@
 #include "bool.h"
 
 typedef struct StatusSubsystemData{
-    unsigned int *statusPtr;
+    unsigned int *batteryStatePtr;
 }statusSubsystemData;
 
 void StatusSubsystemFunction(void *data);
