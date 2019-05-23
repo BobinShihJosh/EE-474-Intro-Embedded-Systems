@@ -4,9 +4,9 @@
 #include "bool.h"
 
 typedef struct TFTkeypadSubsystemData{
-    unsigned int *functionSelectPtr;
-    unsigned int *measurementSelectionPtr;
-    unsigned int *alarmAcknowledgePtr;
+    unsigned short *functionSelectPtr;
+    unsigned short *measurementSelectionPtr;
+    unsigned short *alarmAcknowledgePtr;
 }tftkeypadSubsystemData;
 
 void TFTkeypadSubsystemFunction(void *data);
