@@ -12,8 +12,8 @@ void TFTkeypadSubsystemFunction(void *data)
     //MeasurementSelectionPtr =2: Take pulserate measurement;
     //MeasurementSelectionPtr =3: Take respiration measurement;
     tftkeypadSubsystemData *tftkeypadData = (tftkeypadSubsystemData*) data;
-    if (*(tftkeypadData->FunctionSelectPtr)==0 )
-        switch (*(tftkeypadData->MeasurementSelectionPtr))
+    if (*(tftkeypadData->functionSelectPtr)==0 )
+        switch (*(tftkeypadData->measurementSelectionPtr))
     {
         case 1:
             Serial.println("Start to measure blood pressure.\n");
