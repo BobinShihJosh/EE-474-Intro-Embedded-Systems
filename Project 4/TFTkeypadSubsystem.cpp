@@ -11,7 +11,7 @@ void TFTkeypadSubsystemFunction(void *data)
     //MeasurementSelectionPtr =1: Take bloodpressure measurement;
     //MeasurementSelectionPtr =2: Take pulserate measurement;
     //MeasurementSelectionPtr =3: Take respiration measurement;
-    tftkeypadSubsystemData *tftkeypadData = tftkeypadSubsystemData *data;
+    tftkeypadSubsystemData *tftkeypadData = (tftkeypadSubsystemData*) data;
     if (*(tftkeypadData->FunctionSelectPtr)==0 )
         switch (*(tftkeypadData->MeasurementSelectionPtr))
     {
