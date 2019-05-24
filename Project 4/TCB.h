@@ -3,15 +3,12 @@
 
 typedef enum {PIRORITY_REAL_TIME,PRIORITY_HIGH,PRIORITY_LOW} TaskPriority;
 
-typedef struct Node    //Change myStruct to Node
+typedef struct myStruct
 {
-    void* taskDataPtr;  //pointer that stores the address of the task data struct
-    void (*taskPtr)(void*);  //pointer that stores the address of the tasks, function input variable is void* type
+    void* taskDataPtr;
+    void (*taskPtr)(void*);
     TaskPriority priority;
-    struct Node* next; //pointer that stores the address of the right node
-    struct Node* prev;  //pointer that stores the address of the left node
 }TCB;
-/* above code does not allocate memory but it just tells the compiler that our node composed of three variables vise *left, data, *right*/
 
 //invokes TCB's function, passing in the giving task info
 //schedules the TCB to run at least the given number of
@@ -22,7 +19,7 @@ typedef struct Node    //Change myStruct to Node
 void invoke(TCB* tcb);
 
 //Initialized TCB with the given info
-void initTCB(TCB* tcb,void* taskDataPtr, void (*taskPtr)(void*),TaskPriority priority);
+void intiTCB(TCB* tcb,void* taskDataPtr, void (*taskPtr)(void*),TaskPriority priority);
 
 
 #endif // TCB_H_INCLUDED
