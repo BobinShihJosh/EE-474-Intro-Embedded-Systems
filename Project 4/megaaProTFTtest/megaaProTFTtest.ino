@@ -6,6 +6,7 @@
 #include <Elegoo_GFX.h>    // Core graphics library
 #include <Elegoo_TFTLCD.h> // Hardware-specific library
 #include <TouchScreen.h>
+#include "bool.h"
 //#include "globals.h"
 
 
@@ -221,22 +222,41 @@ void setup(void) {
   
   //================================Warning/Alarm Subsystem DATA==============================================
 
-  unsigned int bpOutOfRange = 0;
-  unsigned int tempOutOfRange = 0;
-  unsigned int pulseOutOfRange = 0;
+  unsigned char bpOutOfRange = 0;
+  unsigned char tempOutOfRange = 0;
+  unsigned char pulseOutOfRange = 0;
+  unsigned char rrOutOfRange = 0;
+  Bool bpHigh = FALSE;
+  Bool tempHigh = FALSE;
+  Bool pulseLow = FALSE;
+  Bool rrLow = FALSE;
+  Bool rrHigh = FALSE;
+  Bool lowBattery = FALSE;
   
   typedef struct WarningAlarmSubsystemData{
     unsigned short *functionSelectPtr;
+    // Data Pointers
     unsigned int *temperatureRawPtr;
     unsigned int *systolicPressRawPtr;
     unsigned int *diastolicPressRawPtr;
     unsigned int *pulseRateRawPtr;
+    unsigned int *respirationRateRawPtr;
     unsigned short *batteryStatePtr;
-    unsigned int *bpOutOfRangePtr;
-    unsigned int *tempOutOfRangePtr;
-    unsigned int *pulseOutOfRangePtr;
+    // FOR ALARMS - RED
+    unsigned char *bpOutOfRangePtr;
+    unsigned char *tempOutOfRangePtr;
+    unsigned char *pulseOutOfRangePtr;
+    unsigned char *rrOutOfRangePtr;
+    unsigned char *lowBatteryPtr;
+    // FOR WARNING - ORANGE
+    Bool *bpHighPtr;
+    Bool *tempHighPtr;
+    Bool *pulseLowPtr;
+    Bool *rrLowPtr;
+    Bool *rrHighPtr;
     unsigned long *localTime;
-  }warningAlarmSubsystemData; 
+    unsigned short *alarmAcknowledgePtr;
+  } warningAlarmSubsystemData;
 
   
  //===================================DisplaySubsystem DATA==============================================
@@ -252,9 +272,9 @@ void setup(void) {
     unsigned char* diasCorrectedPtr;
     unsigned char* prCorrectedPtr;
     unsigned short* batteryStatePtr;
-    unsigned int *bpOutOfRangePtr;
-    unsigned int *tempOutOfRangePtr;
-    unsigned int *pulseOutOfRangePtr;
+    unsigned char *bpOutOfRangePtr;
+    unsigned char *tempOutOfRangePtr;
+    unsigned char *pulseOutOfRangePtr;
     unsigned long *localTime;
   } displaySubsystemData;
 
@@ -493,32 +513,65 @@ void setup(void) {
   //================================Warning/Alarm Task==============================================
   void WarningAlarmSubsystemFunction(void *data)
 {
-    unsigned long t1 = millis();
-    warningAlarmSubsystemData* warningAlarmData = (warningAlarmSubsystemData*) data;
+        warningAlarmSubsystemData* warningAlarmData = (warningAlarmSubsystemData*) data;
+    unsigned int temp = *warningAlarmData->temperatureRawPtr;
+    unsigned int systolicPress = *warningAlarmData->systolicPressRawPtr;
+    unsigned int diastolicPress = *warningAlarmData->diastolicPressRawPtr;
+    unsigned int pulseRate = *warningAlarmData->pulseOutOfRangePtr;
+    unsigned int respirationRate = *warningAlarmData->respirationRateRawPtr;
+    unsigned int battery = *warningAlarmData->batteryStatePtr;
+    unsigned short acknowledge = *warningAlarmData->alarmAcknowledgePtr;
 
-    //Temperature range 36.1C to 37.8C  //Temperature should not be unsigned int, float is more proper...
-    if (*(unsigned int*)(warningAlarmData->temperatureRawPtr) < 36.1 ||
-        *(unsigned int*)(warningAlarmData->temperatureRawPtr) > 37.8) {
-      *(unsigned int*)(warningAlarmData->tempOutOfRangePtr) = 1; 
+    // Temp warning & alarm
+    if (temp < 36.1 * 0.95 || temp > 37.8 * 1.05) {
+        *warningAlarmData->tempHighPtr = TRUE; // need to be orange and falsh at 1 sec rate
+        if ((temp < 36.1 * 0.85 || temp > 37.8 * 1.15) && acknowledge == 0) {
+            *warningAlarmData->tempOutOfRangePtr = 1; // need to be red and flash at 1 sec rate    
+        }
     } else {
-      *(unsigned int*)(warningAlarmData->tempOutOfRangePtr) = 0;
-    }
-    if (*(unsigned int*)(warningAlarmData->systolicPressRawPtr) > 120 || 
-        *(unsigned int*)(warningAlarmData->diastolicPressRawPtr) < 80) {
-      *(unsigned int*)(warningAlarmData->bpOutOfRangePtr) = 1; 
+        *warningAlarmData->tempOutOfRangePtr = 0;
+        *warningAlarmData->tempHighPtr = FALSE;
+    } 
+    // BP warning & alarm
+    if (systolicPress < 120 * 0.95 || systolicPress > 130 * 1.05 || diastolicPress < 70 * 0.95 || diastolicPress > 80 * 1.05) {
+        *warningAlarmData->bpHighPtr = TRUE; // need to be orange and flash at 0.5 sec rate
+        if ((systolicPress < 120 * 0.8 || systolicPress > 130 * 1.2) && acknowledge == 0) {
+            *warningAlarmData->bpOutOfRangePtr = 1; // need to be red and flash at 0.5 sec rate
+        }
     } else {
-      *(unsigned int*)(warningAlarmData->bpOutOfRangePtr) = 0; 
+        *warningAlarmData->bpHighPtr = FALSE;
+        *warningAlarmData->bpOutOfRangePtr = 0;
     }
-    if (*(unsigned int*)(warningAlarmData->pulseRateRawPtr) > 100 || 
-        *(unsigned int*)(warningAlarmData->pulseRateRawPtr) < 60) {
-      *(unsigned int*)(warningAlarmData->pulseOutOfRangePtr) = 1; 
+    // PR warning & alarm
+    if (pulseRate < 60 * 0.95 || pulseRate > 100 * 1.05) {
+        *warningAlarmData->pulseLowPtr = TRUE; // Oragne & flash 2 sec rate
+        if ((pulseRate < 60 * 0.85 || pulseRate > 100 * 1.15) && acknowledge == 0) {
+            *warningAlarmData->pulseOutOfRangePtr = 1; // Red & flash 2 sec rate
+        }
     } else {
-      *(unsigned int*)(warningAlarmData->pulseOutOfRangePtr) = 0;
+        *warningAlarmData->pulseLowPtr = FALSE;
+        *warningAlarmData->pulseOutOfRangePtr = 0;
     }
-    unsigned long t2 = millis();
-    unsigned long taskTime = t2-t1;
-//    tft.print("Warning Time: ");
-//    tft.println(taskTime);
+    // RR warning & alarm
+    if (respirationRate < 12 * 0.95) {
+        *warningAlarmData->rrLowPtr = TRUE; // Orange but no flash
+        if ((respirationRate < 12 * 0.85) && acknowledge == 0) {
+            *warningAlarmData->rrOutOfRangePtr = 1; // Red but no flash
+        }
+    } else if (respirationRate > 25 * 1.05) {
+        *warningAlarmData->rrHighPtr = TRUE; // Orange but no flash
+        if ((respirationRate > 25 * 1.15) && acknowledge == 0) {
+            *warningAlarmData->rrOutOfRangePtr = 1; // Red but no flash
+        }
+    } else {
+        *warningAlarmData->rrLowPtr = FALSE;
+        *warningAlarmData->rrHighPtr = FALSE;
+        *warningAlarmData->rrOutOfRangePtr = 0;
+    }
+    // Battery warning & alarm
+    if (battery < 40) {
+        *warningAlarmData->lowBatteryPtr = 1; // Red but no flash
+    }
 }
 
   
