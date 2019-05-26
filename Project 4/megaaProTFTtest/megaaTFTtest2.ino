@@ -10,6 +10,7 @@
 Elegoo_GFX_Button buttons[15];
 
 
+
 // The control pins for the LCD can be assigned to any digital or
 // analog pins...but we'll use the analog pins as this allows us to
 // double up the pins with the touch screen (see the TFT paint example).
@@ -37,6 +38,7 @@ Elegoo_GFX_Button buttons[15];
 #define  BLACK   0x0000
 #define BLUE    0x001F
 #define RED     0xF800
+#define ORANGE  0xFA60  
 #define GREEN   0x07E0
 #define CYAN    0x07FF
 #define MAGENTA 0xF81F
@@ -158,9 +160,10 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
  //===================================ComputeSubsystem DATA========================================== 
 
   double tempCorrected = 75;
-  unsigned char systolicPressCorrected = 80;
-  unsigned char diastolicPressCorrected = 80;
-  unsigned char pulseRateCorrected = 50;  
+  unsigned int systolicPressCorrected = 80;
+  unsigned int diastolicPressCorrected = 80;
+  unsigned int pulseRateCorrected = 50;
+  unsigned int respirationRateCorrected = 7;  
   
   typedef struct ComputeSubsystemData{
     unsigned short *functionSelectPtr;
@@ -169,9 +172,9 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
     unsigned int *diastolicPressRawPtr;
     unsigned int *pulseRateRawPtr;
     double *tempCorrectedPtr;
-    unsigned char *sysPressCorrectedPtr;
-    unsigned char *diasCorrectedPtr;
-    unsigned char *prCorrectedPtr;
+    unsigned int *sysPressCorrectedPtr;
+    unsigned int *diasCorrectedPtr;
+    unsigned int *prCorrectedPtr;
     unsigned long *localTime;
   }computeSubsystemData;
   
@@ -221,26 +224,31 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
   unsigned short batteryState = 200;
   
   typedef struct DisplaySubsystemData{
+    // Data
+    double *tempCorrectedPtr;
+    unsigned int *sysCorrectedPtr;
+    unsigned int *diasCorrectedPtr;
+    unsigned int *prCorrectedPtr;
+    unsigned int *rrCorrectedPtr;
+    unsigned int *batteryStatePtr;
+    // Selection
     unsigned short *functionSelectPtr;
-    double* tempCorrectedPtr;
-    unsigned char* sysCorrectedPtr;
-    unsigned char* diasCorrectedPtr;
-    unsigned char* prCorrectedPtr;
-    unsigned short* batteryStatePtr;
-    // FOR ALARMS - RED
-    unsigned char *bpOutOfRangePtr;
+    // Red Ptr
     unsigned char *tempOutOfRangePtr;
+    unsigned char *bpOutOfRangePtr;
     unsigned char *pulseOutOfRangePtr;
     unsigned char *rrOutOfRangePtr;
     unsigned char *lowBatteryPtr;
-    // FOR WARNING - ORANGE
+    // Orange Ptr
     bool *bpHighPtr;
     bool *tempHighPtr;
     bool *pulseLowPtr;
     bool *rrLowPtr;
     bool *rrHighPtr;
-    unsigned long *localTime;
+    // Acknowledge
     unsigned short *alarmAcknowledgePtr;
+    // Time
+    unsigned long *localTime;
   } displaySubsystemData;
 
 
@@ -633,10 +641,14 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
     tft.println("Temperature");
     tft.print("<");
     tft.fillRect(5, 7, 35, 10, BLACK);
-    if (*(unsigned int*)(displayData->tempOutOfRangePtr) == 1) {
-      tft.setTextColor(RED); //tft.setTextSize(2);
+    if (*(displayData->tempHighPtr)) {
+        tft.setTextColor(ORANGE);
+        if (*(unsigned int*)(displayData->tempOutOfRangePtr) == 1 && *(displayData->alarmAcknowledgePtr) == 0) {
+          tft.setTextColor(RED); //tft.setTextSize(2);
+        }
     }
-    tft.print(*(double*)(displayData->tempCorrectedPtr));
+    
+    tft.print(*(unsigned char*)(displayData->tempCorrectedPtr));
     tft.setTextColor(GREEN); //tft.setTextSize(2);
     tft.println("> C");
     tft.println(" ");
@@ -645,9 +657,13 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
     tft.println("Systolic Pressure");
     tft.print("<");
     tft.fillRect(5, 32, 70, 10, BLACK);
-    if (*(unsigned int*)(displayData->bpOutOfRangePtr) == 1) {
-      tft.setTextColor(RED); //tft.setTextSize(2);
+    if (*(displayData->bpHighPtr)) {
+        tft.setTextColor(ORANGE);
+        if (*(unsigned int*)(displayData->bpOutOfRangePtr) == 1 && *(displayData->alarmAcknowledgePtr) == 0) {
+            tft.setTextColor(RED); //tft.setTextSize(2);
+        }
     }
+    
     tft.print(*(unsigned char*)(displayData->sysCorrectedPtr));
     tft.setTextColor(GREEN); //tft.setTextSize(2);
     tft.println("> mm Hg");
@@ -657,8 +673,11 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
     tft.println("Diastolic Pressure");
     tft.print("<");
     tft.fillRect(5, 55, 70, 10, BLACK);
-    if (*(unsigned int*)(displayData->bpOutOfRangePtr) == 1) {
-      tft.setTextColor(RED); //tft.setTextSize(2);
+    if (*(displayData->bpHighPtr)) {
+        tft.setTextColor(ORANGE);
+        if (*(unsigned int*)(displayData->bpOutOfRangePtr) == 1 && *(displayData->alarmAcknowledgePtr) == 0) {
+            tft.setTextColor(RED); //tft.setTextSize(2);
+        }
     }
     tft.print(*(unsigned char*)(displayData->diasCorrectedPtr));
     tft.setTextColor(GREEN); //tft.setTextSize(2);
@@ -669,19 +688,37 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
     tft.println("Pulse Rate");
     tft.print("<");
     tft.fillRect(5, 79, 60, 10, BLACK);
-    if (*(unsigned int*)(displayData->pulseOutOfRangePtr) == 1) {
-      tft.setTextColor(RED); //tft.setTextSize(2);
+    if (*(displayData->pulseLowPtr)) {
+        tft.setTextColor(ORANGE);
+        if (*(unsigned int*)(displayData->pulseOutOfRangePtr) == 1 && *(displayData->alarmAcknowledgePtr) == 0) {
+            tft.setTextColor(RED); //tft.setTextSize(2);
+        }
     }
     tft.print(*(unsigned char*)(displayData->prCorrectedPtr));
     tft.setTextColor(GREEN); //tft.setTextSize(2);
-    tft.println("> BMP>");
+    tft.println("> BPM");
+    tft.println(" ");
+    
+    //respiration rate
+    tft.println("Respiration Rate");
+    tft.print("<");
+    tft.fillRect(5, 104, 70, 10, BLACK);
+    if (*(displayData->rrLowPtr) || *(displayData->rrHighPtr)) {
+        tft.setTextColor(ORANGE);
+        if (*(unsigned int*)(displayData->rrOutOfRangePtr) == 1 && *(displayData->alarmAcknowledgePtr) == 0) {
+            tft.setTextColor(RED); //tft.setTextSize(2);
+        }
+    }
+    tft.print(*(unsigned char*)(displayData->rrCorrectedPtr));
+    tft.setTextColor(GREEN); //tft.setTextSize(2);
+    tft.println("> RR");
     tft.println(" ");
     
     //battery state
     tft.println("Battery");
     tft.print("<");
-    tft.fillRect(5, 104, 50, 10, BLACK);
-    if (*(unsigned int*)(displayData->batteryStatePtr) < 21) {
+    tft.fillRect(5, 130, 50, 10, BLACK);
+    if (*(unsigned int*)(displayData->batteryStatePtr) < 40) {
       tft.setTextColor(RED); //tft.setTextSize(2);
     }
     tft.print(*(unsigned char*)(displayData->batteryStatePtr));
@@ -812,19 +849,22 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
       
      //================================= DISPLAY===========================
       displaySubsystemData dsd;
-    
+      
+      // Data
       dsd.tempCorrectedPtr = &tempCorrected;
       dsd.sysCorrectedPtr = &systolicPressCorrected;
       dsd.diasCorrectedPtr = &diastolicPressCorrected;
       dsd.prCorrectedPtr = &pulseRateCorrected;
+      dsd.rrCorrectedPtr = &respirationRateCorrected;
       dsd.batteryStatePtr = &batteryState;
-
+      // Red Ptr
       dsd.bpOutOfRangePtr = &bpOutOfRange;
       dsd.tempOutOfRangePtr = &tempOutOfRange;
       dsd.pulseOutOfRangePtr = &pulseOutOfRange;
       dsd.rrOutOfRangePtr = &rrOutOfRange;
       //dsd.lowerBatteryPtr = &lowBattery;
-      
+
+      // Orange Ptr
       dsd.bpHighPtr = &bpHigh;
       dsd.tempHighPtr = &tempHigh;
       dsd.pulseLowPtr = &pulseLow;
