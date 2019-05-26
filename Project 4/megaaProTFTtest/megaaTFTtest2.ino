@@ -291,7 +291,7 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
       p.x = (tft.width() - map(p.x, TS_MINX, TS_MAXX, tft.width(), 0));
       p.y = (tft.height()-map(p.y, TS_MINY, TS_MAXY, tft.height(), 0));//
      }
-    for (uint8_t b=0; b<8; b++) {
+    for (uint8_t b=0; b<10; b++) {
       if (buttons[b].contains(p.x, p.y)) {
         buttons[b].press(true);  // tell the button it is pressed
         
@@ -300,7 +300,7 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
       }
     }
     // now we can ask the buttons if their state has changed
-    for (uint8_t b=0; b<9; b++) {
+    for (uint8_t b=0; b<10; b++) {
       if (buttons[b].justReleased()) {
         buttons[b].drawButton();  // draw normal
       }
@@ -326,17 +326,23 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
             Serial.println(F("functionselectptr in TFT"));
             Serial.println(*(TFTData->functionSelectPtr));
             //Serial.println(F("Menu mode"));
-            buttons[4].initButton(&tft, 250, 140, 150, 25, ILI9341_GREEN, ILI9341_LIGHTGREY, ILI9341_GREEN,
-                        "Temperature", 2); 
+            tft.setTextColor(GREEN); tft.setTextSize(1);tft.setCursor(210, 100);
+            tft.println(F("Take a Measurement"));
+            buttons[4].initButton(&tft, 270, 160, 150, 20, ILI9341_GREEN, ILI9341_LIGHTGREY, ILI9341_GREEN,
+                        "Temp", 1); 
             buttons[4].drawButton();
   
-            buttons[5].initButton(&tft, 250, 180, 150, 25, ILI9341_GREEN, ILI9341_LIGHTGREY, ILI9341_GREEN,
-                        "Blood Pressure", 2); 
+            buttons[5].initButton(&tft, 270, 190, 150, 20, ILI9341_GREEN, ILI9341_LIGHTGREY, ILI9341_GREEN,
+                        "Blood.P", 1); 
             buttons[5].drawButton();
   
-            buttons[6].initButton(&tft, 250, 220, 150, 25, ILI9341_GREEN, ILI9341_LIGHTGREY, ILI9341_GREEN,
-                        "Pulse Rate", 2); 
+            buttons[6].initButton(&tft, 270, 220, 150, 20, ILI9341_GREEN, ILI9341_LIGHTGREY, ILI9341_GREEN,
+                        "Pulse.R", 1); 
             buttons[6].drawButton();
+
+            buttons[9].initButton(&tft, 270, 130, 150, 20, ILI9341_GREEN, ILI9341_LIGHTGREY, ILI9341_GREEN,
+                        "Resp.R", 1); 
+            buttons[9].drawButton();
             out = 2;
           }
           if (b == 4) {
@@ -362,6 +368,14 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
                 Serial.println(*(TFTData->measurementSelectionPtr));
                 out = 2;
               }
+          if (b == 9) {
+                Serial.println(F("measure respiration rate"));
+                *(TFTData->functionSelectPtr) = 1;
+                *(TFTData->measurementSelectionPtr) = 4;
+                Serial.println(*(TFTData->measurementSelectionPtr));
+                out = 2;
+              }
+          
           if (b == 7) {
             *(TFTData->alarmAcknowledgePtr) = 1;
             out = 2;
@@ -865,6 +879,7 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
         tail->taskPtr((void*)&mstd);
         deleteNode(&measureTask);
         Serial.println(F("Just inserted, executed, and deleted measure in SCHEDULER"));
+        //*(scheduleData->measurementSelectionPtr)=0;
       }
     
       if (*(scheduleData->functionSelectPtr) == 1&& *(scheduleData->measurementSelectionPtr)!=0) {
@@ -873,6 +888,7 @@ TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
         tail->taskPtr((void*)&csd);
         deleteNode(&computeTask);
         Serial.println(F("Just inserted, executed, and deleted compute in SCHEDULER"));
+        *(scheduleData->measurementSelectionPtr)=0;
       }
       
       insert(&warningAlarmTask);
@@ -975,5 +991,5 @@ void loop(void) {
   SSSD.enableDisplayPtr = &enableDisplay;
 
   schedulerSubsystemFunction((void*)&SSSD);
-  //delay(100);
+  delay(100);
 }
