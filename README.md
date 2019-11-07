@@ -1,6 +1,6 @@
 
 # Low-Cost touch screen Medical Monitering System
-![alt text](file:///Users/joshshih/Desktop/Screen%20Shot%202019-11-06%20at%209.58.14%20PM.png)
+![alt text](https://github.com/BobinShihJosh/EE-474-Intro-Embedded-Systems/blob/master/Project%204/image2.png)
 ## Project Specifications:
 This project is the first phase in the development of a low cost, portable, medical monitoring
 system. The current phase focuses on the design and development of the basic system
