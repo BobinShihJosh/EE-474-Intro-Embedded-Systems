@@ -1,6 +1,6 @@
 
 # Low-Cost touch screen Medical Monitering System
-![System](file:///Users/joshshih/Desktop/Screen%20Shot%202019-11-06%20at%209.58.14%20PM.png)
+Format: ![Alt Text](file:///Users/joshshih/Desktop/Screen%20Shot%202019-11-06%20at%209.58.14%20PM.png)
 ## Project Specifications:
 This project is the first phase in the development of a low cost, portable, medical monitoring
 system. The current phase focuses on the design and development of the basic system
