@@ -1,6 +1,6 @@
 
 # Low-Cost touch screen Medical Monitering System
-
+![GitHub Logo](/images/logo.png)
 ## Project Specifications:
 This project is the first phase in the development of a low cost, portable, medical monitoring
 system. The current phase focuses on the design and development of the basic system
